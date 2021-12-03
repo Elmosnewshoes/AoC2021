@@ -27,19 +27,15 @@ def count(lst, col):
 def scrub(lst, crit, col):
     return [rw for rw in lst if rw[col] == str(crit)]
 
-oxy = data
-co2 = data
-col = 0
-while len(oxy) > 1:
-    comm_val = count(oxy, col)
-    oxy = scrub(oxy, comm_val, col)
-    col += 1
+def iter_log(bitflip = 0):
+    tmp = data
+    col = 0
+    while len(tmp) > 1:
+        comm_val = count(tmp, col)
+        tmp = scrub(tmp, abs(bitflip - comm_val), col)
+        col += 1
+    return tmp
 
-col = 0
-while len(co2) > 1:
-    comm_val = count(co2, col)
-    co2 = scrub(co2, 1- comm_val, col)
-    col += 1
-
-
+oxy = iter_log(0)
+co2 = iter_log(1)
 print(f'Ans pt2 = {int(oxy[0],2) * int(co2[0],2)}')
