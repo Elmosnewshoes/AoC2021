@@ -24,13 +24,11 @@ class PuzzleCard:
     def eval_bingo(self):
         if self.done:
             return False
-        self.done = True
         chck = self.card.shape[0] * -1
-        if chck in self.card.sum(axis = 0):
-            return True
-        if chck in self.card.sum(axis = 1):
-            return True
-        self.done = False
+        for ax in (0, 1):
+            if chck in self.card.sum(axis = ax):
+                self.done = True
+                return True
         return False
 
 
