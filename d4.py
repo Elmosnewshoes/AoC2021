@@ -33,7 +33,7 @@ class PuzzleCard:
         self.done = False
         return False
 
-    
+
     def score(self):
         tmp = np.where(self.card == -1, 0, self.card).flatten()
         return tmp.sum()*self.last_nmbr
@@ -45,7 +45,7 @@ class PuzzleCard:
 def puzzle(filename):
     cards = []
     with open(filename) as f:
-        draws = to_array(f.readline()) 
+        draws = to_array(f.readline())
 
         for l in f:
             if l == '\n':
