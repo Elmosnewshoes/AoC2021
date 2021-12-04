@@ -1,0 +1,55 @@
+import numpy as np
+
+def to_array(txtline):
+    return np.array([int(x) for x in txtline.replace('\n','').replace(' ',',').split(',') if x != ''])
+
+class PuzzleCard:
+
+    def __init__(self, firstline):
+        self.card = firstline
+
+
+    def __add__(self, other):
+        self.card = np.vstack([self.card, other])
+        return self
+
+
+    def cross_off(self, nmbr):
+        self.card = np.where(self.card==nmbr, -1, self.card)
+
+
+    def eval_bingo(self):
+        chck = self.shape[0] * -1
+        if chck in self.card.sum(axis = 0):
+            return True
+        if chck in self.card.sum(axis = 1):
+            return True
+        return False
+
+
+    def __str__(self,):
+        return np.array2string(self.card)
+
+
+def puzzle(filename):
+    cards = []
+    with open(filename) as f:
+        draws = to_array(f.readline()) 
+
+        for l in f:
+            if l == '\n':
+                cards.append(PuzzleCard(to_array(f.readline())))
+            else:
+                print(l)
+                cards[-1] += to_array(l)
+    return cards
+
+
+cards = puzzle('tst_d4.txt')
+cards[0].cross_off(1)
+cards[0].cross_off(6)
+print(cards[0].eval_bingo())
+cards[0].cross_off(21)
+cards[0].cross_off(8)
+cards[0].cross_off(22)
+print(cards[0].eval_bingo())
