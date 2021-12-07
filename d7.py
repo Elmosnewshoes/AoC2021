@@ -22,7 +22,7 @@ def q12(inp_arr):
     energy_required1 = [calc_energy_required(inp_arr, x) for x in positions]
 
     # pt2
-    # cache fuel cost per position
+    # cache fuel cost per distance
     fuel_cost = [np.sum(positions[:i+1]) for i in range(len(positions))]
 
     energy_required2 = [calc_energy_required_2(inp_arr, x, fuel_cost) for x in positions]
