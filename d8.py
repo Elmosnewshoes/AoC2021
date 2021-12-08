@@ -55,7 +55,7 @@ class Digit:
             if (ind := output_to_number(signal)) > -1:
                 self.digits[ind] = signal
 
-        " loop until only the number 0 remains "
+        " loop until only the signal for number 0 remains "
         while len([s for s in self.digits if s == '']) > 1:
             for signal in [x for x in self.signals if x not in self.digits]:
                 if (len(signal) == 6 and self.len_reduce(signal, 4, 7) == 1):
