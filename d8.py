@@ -47,6 +47,7 @@ class Digit:
 
     def len_reduce(self, x, *indexes):
         " translate number to signal and execute inp_reduce on the result "
+        " Return the length of the remainder "
         return len(inp_reduce(x, *[self.d(i) for i in indexes]))
 
     def map_knowns(self):
