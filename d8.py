@@ -27,12 +27,6 @@ for rw in signals:
 
 print(counter)
 
-def combine(*inputs):
-    inp = ''
-    for i in inputs:
-        inp += i
-    return ''.join(list((set([lttr for lttr in inp]))))
-
 
 def inp_reduce(tgt, *inputs):
     " Return the characters in tgt that are not in any of the other arguments "
