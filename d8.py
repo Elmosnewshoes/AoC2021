@@ -33,29 +33,35 @@ def combine(*inputs):
         inp += i
     return ''.join(list((set([lttr for lttr in inp]))))
 
-def reduce_str(a: str, b: str) -> str:
-    return ''.join([ch for ch in a if ch not in b])
 
 def inp_reduce(tgt, *inputs):
-    return reduce_str(tgt, ''.join(inputs))
+    " Return the characters in tgt that are not in any of the other arguments "
+    return ''.join([ch for ch in tgt if ch not in ''.join(inputs)])
 
 class Digit:
     def __init__(self, inp):
         signal_line, output_line = inp.split(' | ')
-        self.signals = signal_line.split(' ')
-        self.output = output_line.split(' ')
+        self.signals = signal_line.split(' ') # signals
+        self.output = output_line.split(' ') # the output of the display
+
+        # placeholder for the signal to digit mapping
         self.digits = ['' for _ in range(10)]
 
     def d(self, ind):
+        " Lookup number to corresponding signal "
         return self.digits[ind]
 
     def len_reduce(self, x, *indexes):
+        " translate number to signal and execute inp_reduce on the result "
         return len(inp_reduce(x, *[self.d(i) for i in indexes]))
 
     def map_knowns(self):
         for signal in self.signals:
+            " store the easiest numbers (1, 4, 7, 8) "
             if (ind := output_to_number(signal)) > -1:
                 self.digits[ind] = signal
+
+        " loop until only the number 0 remains "
         while len([s for s in self.digits if s == '']) > 1:
             for signal in [x for x in self.signals if x not in self.digits]:
                 if (len(signal) == 6 and self.len_reduce(signal, 4, 7) == 1):
@@ -70,15 +76,18 @@ class Digit:
                      1 and self.len_reduce(signal, 7) == 4):
                     self.digits[6] = signal
 
+        " When all is mapped, the 0 remains "
         for s in self.signals:
             if s not in self.digits:
                 self.digits[0] = s
 
     def print_digit(self, digit):
         def sorted_digit(x):
+            " sort the signal alfabetically "
             return ''.join(sorted(x))
 
         for i, d in enumerate(self.digits):
+            " match the sorted signal to sorted number "
             if sorted_digit(d) == sorted_digit(digit):
                 return str(i)
 
@@ -93,6 +102,5 @@ for ln in signals:
     d = Digit(ln)
     d.map_knowns()
     counter += d.digit_sum()
-    print(d.output, d.digit_sum())
 
 print(counter)
