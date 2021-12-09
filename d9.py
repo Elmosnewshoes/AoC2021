@@ -49,19 +49,20 @@ class Map:
                     total_risk.append(self.calculate_risk(y,x))
         return total_risk
 
-    def find_basins(self, minima_loc: Tuple[int], yx: Tuple[int]) -> None:
+    def expand_basin(self, minima_loc: Tuple[int], yx: Tuple[int]) -> None:
         " Recursion FTW! "
         " Check for an y,x-pair, if it is already in the basin, if not .."
         " .. add it to the basin and run this method on the adjacents "
+        " the basin is id-ed by minima_loc (key of dictionary self.basins "
         for adj_yx in self.adjacents_basin(*yx):
             if adj_yx not in self.basins[minima_loc]:
                 self.basins[minima_loc].append(adj_yx)
-                self.find_basins(minima_loc, adj_yx)
+                self.expand_basin(minima_loc, adj_yx)
 
     def populate_basins(self) -> None:
         " For each minima location, calculate the corresponding basin "
         for yx in self.minima:
-            self.find_basins(yx, yx)
+            self.expand_basin(yx, yx)
 
     def get_basin_sizes(self)-> List[int]:
         " Return the size of each basin in sorted order DESC "
