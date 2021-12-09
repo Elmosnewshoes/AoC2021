@@ -35,8 +35,9 @@ class Map:
     def is_minimal(self, y: int, x: int) -> bool:
         adjacent_values = [self.get_height(*yx) for yx in self.adjacents(y,x)]
         if self.heights[y][x] < min(adjacent_values):
-            self.minima.append((y, x))
-            self.basins[(y, x)] = []
+            " When the height is lower than the adjacent heights ... "
+            self.minima.append((y, x))  # store the location of the minimum
+            self.basins[(y, x)] = []  # initiate a dictionary entry
             return True
         return False
 
@@ -48,17 +49,22 @@ class Map:
                     total_risk.append(self.calculate_risk(y,x))
         return total_risk
 
-    def find_basins(self, minima_loc: Tuple[int], yx: Tuple[int]):
+    def find_basins(self, minima_loc: Tuple[int], yx: Tuple[int]) -> None:
+        " Recursion FTW! "
+        " Check for an y,x-pair, if it is already in the basin, if not .."
+        " .. add it to the basin and run this method on the adjacents "
         for adj_yx in self.adjacents_basin(*yx):
             if adj_yx not in self.basins[minima_loc]:
                 self.basins[minima_loc].append(adj_yx)
                 self.find_basins(minima_loc, adj_yx)
 
-    def populate_basins(self):
+    def populate_basins(self) -> None:
+        " For each minima location, calculate the corresponding basin "
         for yx in self.minima:
             self.find_basins(yx, yx)
 
     def get_basin_sizes(self)-> List[int]:
+        " Return the size of each basin in sorted order DESC "
         return sorted([len(locs) for locs in self.basins.values()], reverse
                       = True)
 
