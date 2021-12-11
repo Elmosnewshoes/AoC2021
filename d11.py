@@ -53,11 +53,12 @@ class OctoMap:
         return np.array2string(self.map)
 
 
-Map = OctoMap(pzzl(11, True).strings())
-for i in range(100):
+Map = OctoMap(pzzl(11, False).strings())
+i = 100
+for _ in range(i):
     Map.eval_round()
 print(Map.flashes)
 
 while Map.eval_round() > 0:
     i += 1
-print(i+2)
+print(i+1)
