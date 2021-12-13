@@ -44,18 +44,16 @@ class DotPaper:
                 for i in range(self.imax - magn):
                     self.paper[magn - i][j] += self.paper[i + magn][j]
             self.imax = magn
-        self.paper = np.array(self.paper[:self.imax,:self.jmax], copy = True)
+        self.paper = self.paper[:self.imax,:self.jmax]
 
 folds, dots = parse_input(pzzl(13, False).strings())
 DP = DotPaper(dots)
-print(f'Paper size = [{DP.imax},{DP.jmax}]')
-print(folds[0])
 DP.fold(*folds[0])
 print(f'After 1 fold: {np.count_nonzero(DP.paper)} dots')
-# not 815
+
+
 for instr in folds[1:]:
     DP.fold(*instr)
-print(np.count_nonzero(DP.paper))
-print(np.array2string(DP.paper))
+
 for rw in np.where(DP.paper > 0, 1, DP.paper):
     print(''.join([str(x) for x in rw]).replace('0',' '))
