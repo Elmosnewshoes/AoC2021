@@ -1,4 +1,4 @@
-# hexstring = 'D2FE28'
+hexstring = 'D2FE28'
 # hexstring = 'EE00D40C823060'
 hexstring = '38006F45291200'
 def hex2binstring(nmbr):
@@ -8,6 +8,8 @@ counter = 0
 
 def parse_literal(literal):
     bits = ''
+    literal = literal.ljust(4 * (len(literal) // 4 + 1), '0')
+    print(f'Parsing {literal} to number')
     litlist = list(literal)
     while True:
         start_bit = litlist.pop(0)
@@ -17,6 +19,38 @@ def parse_literal(literal):
             return int(bits, 2), ''.join(litlist)
 
 
+def parse_bitstring(bitstring, n = 1, version_sum = 0):
+    if n == 0:
+        return version_sum
+    elif n > 0:
+        n-= 1
+
+    typeId = int(binstring[3:6], 2)
+    version = int(binstring[:3], 2)
+    print(f'TypeId = {typeId}, version {version}, from {bitstring}')
+    bitstring = bitstring[6:]
+    if typeId == 4:
+        nmbr, remainder = parse_literal(bitstring)
+        if int(remainder, 2) == 0 and n <= 0:
+            n = 0
+        print(f'Got {nmbr}, remaining = {remainder}')
+        return parse_bitstring(remainder, n, version_sum + version)
+
+    ltypeId, bitstring = (int(bitstring[0]), bitstring[1:])
+    if ltypeId == 0:
+        bitslength = int(bitstring[:15], 2)
+        bitstring = bitstring[15:]
+        print(f'Parsing next {bitslength} packets')
+        return parse_bitstring(bitstring[:bitslength], 1, version_sum
+                               + version)
+    else:
+        packets = int(bitstring[:11], 2)
+        bitstring = bitstring[11:]
+        return parse_bitstring(bitstring, packets, version_sum + version)
+
+
+
+
 def parse_header(binstring, no_of_packets, counter):
     """
         return version, typeId, remainder
@@ -24,8 +58,6 @@ def parse_header(binstring, no_of_packets, counter):
     print(f'Got: ', binstring)
     for i in range(no_of_packets):
         print('Cumsum = ', counter)
-        version = int(binstring[:3],2)
-        typeId = int(binstring[3:6], 2)
         ltypeid = int(binstring[6])
         new_counter = counter + version
         print(f'Version {version}, type {typeId}')
@@ -57,18 +89,13 @@ def parse_header(binstring, no_of_packets, counter):
                 parse_header(deeper_binstring, no_of_packets - i, new_counter)
                 binstring = binstring[splice[1]:]
 
-def parse_binstring(binstring):
-    ver, tpe, string = parse_header(binstring)
-    if tpe == 4:
-        lit_value = ''
-        while True:
-            first_bit = string.pop(0)
-            lit_value += string[:4]
-            if first_bit == '0':
-                break
 
 
 
 binstring = hex2binstring(hexstring)
-print(parse_header(binstring, 1, 0))
-print(counter)
+binstring = '1101000101001010010001001000000000'
+# binstring = '11010001010'
+print(parse_bitstring(binstring, -1, 0))
+
+# print(parse_header(binstring, 1, 0))
+# print(counter)
