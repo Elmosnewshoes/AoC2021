@@ -41,6 +41,7 @@ def parse_bitstring(bitstring, n = 1, version_sum = 0):
         bitslength = int(bitstring[:15], 2)
         bitstring = bitstring[15:]
         print(f'Parsing next {bitslength} packets')
+        print(f'Parsing string {bitstring[:bitslength]}')
         return parse_bitstring(bitstring[:bitslength], 1, version_sum
                                + version)
     else:
@@ -93,7 +94,7 @@ def parse_header(binstring, no_of_packets, counter):
 
 
 binstring = hex2binstring(hexstring)
-binstring = '1101000101001010010001001000000000'
+# binstring = '1101000101001010010001001000000000'
 # binstring = '11010001010'
 print(parse_bitstring(binstring, -1, 0))
 
