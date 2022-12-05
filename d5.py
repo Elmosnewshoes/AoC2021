@@ -10,25 +10,53 @@ def split_puzzle(inp):
     split = inp.index('')
     return inp[:split][::-1], inp[split+1:]
 
-def compose_pile(pile_string, piles, layer):
-    # parse a line from the crates part of the puzzle input
-    new_piles = piles
-    for pile, crates in piles.items():
-        ind = pile_string.index(str(pile))
-        if layer[ind] != ' ':
-            new_piles[pile] = crates + layer[ind]
-    return new_piles
 
-def make_starting_pile(init_piles):
-    # get a dictionary indexed by pile number
-    # each pile is a string with crate letters
-    # return the dictionary {1: 'ZN', 2: 'MCD' ..}
-    pile_string = init_piles[0]
-    pilecount = max([int(x) for x in pile_string if x.isnumeric()])
-    piles = {i+1: '' for i in range(pilecount)}
-    for layer in init_piles[1:]:
-        piles = compose_pile(pile_string, piles, layer)
-    return piles
+class Pile():
+    def __init__(self, ):
+        self.stack = ''
+
+    def get(self, n = 1):
+        # take n crates off the stack
+        crates = self.stack[-n:]
+        self.stack = self.stack[:-n]
+        return crates
+
+    def put(self, crates):
+        # put crates on the stack
+        self.stack += crates
+
+    @property
+    def top(self,):
+        return self.stack[-1]
+
+class CratePiles():
+    def __init__(self, init_piles):
+        # init_piles is the first part of the input
+        pile_string = init_piles[0] # the piles and their index
+        pilecount = max([int(x) for x in pile_string if x.isnumeric()])
+        self.piles = {i+1: Pile() for i in range(pilecount)}
+
+        for layer in init_piles[1:]:
+            # loop the config
+            self.add_layer(layer, pile_string)
+
+    def __repr__(self):
+        return '\n'.join([f'Pile {i} = {stack.stack}' for i, stack \
+                          in self.piles.items()])
+
+    def add_layer(self, layer, pile_string):
+        # add a crate on each pile according to config
+        for pilenr, crates in self.piles.items():
+            ind = pile_string.index(str(pilenr))
+            if layer[ind] != ' ':
+                self.piles[pilenr].put(layer[ind])
+
+    def move_crate(self, from_pile, to_pile, n = 1):
+        crates = self.piles[from_pile].get(n)
+        self.piles[to_pile].put(crates)
+
+    def get_top(self,):
+        return ''.join([p.top for p in self.piles.values()])
 
 
 def make_instruction(raw_instruction):
@@ -39,23 +67,14 @@ def make_instruction(raw_instruction):
     from_pile, to_pile = x.split(' to ')
     return int(reps), int(from_pile), int(to_pile)
 
-def move_crate(from_pile, to_pile, piles, n = 1):
-    # execute a single instruction on the pile dictionary
-    # return the newly formed pile dictionary
-    crates = piles[from_pile][-n:]
-    piles[from_pile] = piles[from_pile][:-n]
-    piles[to_pile] = piles[to_pile] + crates
-    return piles
 
-def loop_instructions(piles, instructions, pt = 1):
-    # execute the move_crate for each consecutive instruction
+def execute_instructions(Piles, instructions, pt = 1):
     for reps, from_pile, to_pile in instructions:
         if pt == 1:
             for _ in range(reps):
-                piles = move_crate(from_pile, to_pile, piles)
+                Piles.move_crate(from_pile, to_pile, 1)
         else:
-            piles = move_crate(from_pile, to_pile, piles, reps)
-    return piles
+            Piles.move_crate(from_pile, to_pile, reps)
 
 def get_top(piles):
     # read the answer to the puzzle
@@ -63,17 +82,17 @@ def get_top(piles):
     for pile, crate in piles.items():
         res += crate[-1]
     return res
-        
 
 init_setup, raw_instructions = split_puzzle(raw_input)
 
-piles = make_starting_pile(init_setup)
-print(piles)
 instructions = [make_instruction(instr) for instr in raw_instructions]
 
-result = loop_instructions(piles, instructions)
 
-print(get_top(result))
-piles2 = make_starting_pile(init_setup)
-result2 = loop_instructions(piles2, instructions, pt = 2)
-print(get_top(result2))
+PileOfCrates = CratePiles(init_setup)
+print(PileOfCrates)
+execute_instructions(PileOfCrates, instructions, 1)
+print(PileOfCrates.get_top())
+
+PileOfCrates = CratePiles(init_setup)
+execute_instructions(PileOfCrates, instructions, 2)
+print(PileOfCrates.get_top())
