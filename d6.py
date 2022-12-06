@@ -5,12 +5,12 @@ q6 = pzzl(6, ).strings()[0]
 
 print(tst)
 
-def are_all_characters_unique(txt):
-    return sum([txt.count(c) for c in txt]) == len(txt)
+def are_all_characters_unique(substr):
+    return sum([substr.count(c) for c in substr]) == len(substr)
 
 def find_unique_substring(txt, n = 4):
-    # execute the subroutine to on each substring
-    # to find the first that hass no repeating characters
+    # execute the subroutine on each substring
+    # to find the first substring that has no repeating characters
     for i in range(n, len(txt)):
         if are_all_characters_unique(txt[i-n:i]):
             return i
