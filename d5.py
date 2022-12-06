@@ -76,13 +76,6 @@ def execute_instructions(Piles, instructions, pt = 1):
         else:
             Piles.move_crate(from_pile, to_pile, reps)
 
-def get_top(piles):
-    # read the answer to the puzzle
-    res = ''
-    for pile, crate in piles.items():
-        res += crate[-1]
-    return res
-
 init_setup, raw_instructions = split_puzzle(raw_input)
 
 instructions = [make_instruction(instr) for instr in raw_instructions]
