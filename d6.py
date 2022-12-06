@@ -13,10 +13,10 @@ def are_different(txt, i = 0):
     # until the substring is exhausted, then return True
     # if a character is not unique in the substring, return False
     if i == len(txt):
+        # reached last element, search for char in substr complete
         return True
     subj = txt[i]
-    char_match = [ 1 for ch in txt if ch == subj ]
-    if sum(char_match) > 1:
+    if txt.count(subj) > 1:
         return False
     else:
         return are_different(txt, i+1)
