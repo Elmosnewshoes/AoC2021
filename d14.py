@@ -1,38 +1,47 @@
 from pzzl import pzzl
+from collections import defaultdict as ddict
 
 
 class Cave():
     def __init__(self, rock_points):
         x,y = self.find_max(rock_points)
-        self.offset = int(1e6)
         self.min_row = min(y)
         self.max_row = max(y)
         self.min_col = min(x)
         self.max_col = max(x)
-        self.grid = [[0 for _ in range(self.max_col + 1 + self.offset)]\
-                      for __ in range(self.max_row + 1)]
+        self.grid = [{} for _ in range(self.max_row + 1)]
         for start, end in rock_points:
             self.make_rock(start,end)
 
     def eval(self, rw, col):
+        # return -1 for rock, or 1 for sand,
+        # if not defined in grid, must be open -> return 0
         try:
-            return self.grid[rw][col]
-        except Exception as e:
-            print(f'Couldnt evaluate index {col} at rw {rw}')
-            raise e
+            X = self.grid[rw]
+        except IndexError:
+            return 0
+        if isinstance(X, ddict):
+            return X[col]
+        # annoying dict.get overrides defaultdict's default
+        return X.get(col, 0)
 
     def loop(self, col = 500):
         sands = 0
         while self.drop_sand(col):
             sands += 1
             if self.eval(0, 500) == 1:
+                # condition: sand source is covered up
                 break
         return sands
 
     def __repr__(self,):
         mapping = {1: 'o', -1: '#' , 0: '.'}
-        return '\n'.join([''.join([mapping[x] for x in rw[self.offset + self.min_col:]]) \
-                for rw in self.grid])
+        out = ''
+        for i, rw in enumerate(self.grid):
+            for x in range(self.min_col, self.max_col+1):
+                out+= mapping[self.eval(i, x)]
+            out += '\n'
+        return out
 
     def make_rock(self, start, end):
         x0, y0 = start
@@ -46,7 +55,8 @@ class Cave():
                 self.grid[rw][col] = -1
 
     def drop_sand(self, col = 500, rw = 0):
-        if col+1 > self.max_col or rw + 1 > self.max_row or col-1 < self.min_col:
+        if rw > len(self.grid) + 10:
+            # the sand has fallen 10 beyond the deepest known depth
             return False
         if self.eval(rw+1, col) == 0:
             return self.drop_sand(col, rw +1)
@@ -86,14 +96,16 @@ def make_lines(inp):
 
 tst = pzzl(14, True).strings()
 inp = pzzl(14,).strings()
-coords = make_lines(inp)
+coords = make_lines(tst)
 
 cave = Cave(coords)
 print(cave.loop())
+print(cave)
 
-max_y = cave.max_row
-coords.append(((0,max_y + 2), (1000, max_y + 2)))
 cave2 = Cave(coords)
+cave2.grid.append({})
+rockbottom = ddict(lambda: -1)
+rockbottom.setdefault(500, -1)
+cave2.grid.append(rockbottom) # infinite long layer of rock
 print(cave2.loop())
-
-
+print(cave2)
